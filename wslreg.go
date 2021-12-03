@@ -28,6 +28,30 @@ const (
 	InvalidNum = -1
 )
 
+// GetDefaultDistributionUuid gets default distribution uuid of wsl
+func GetDefaultDistributionUuid() (lxUuid string, err error) {
+	key, err := registry.OpenKey(LxssBaseRoot, LxssBaseKey, registry.READ)
+	if err != nil {
+		return
+	}
+	lxUuid, _, tmpErr := key.GetStringValue("DefaultDistribution")
+	if tmpErr != nil && tmpErr != io.EOF {
+		err = tmpErr
+	}
+	return
+}
+
+// GetDefaultDistributionProfile gets default distribution profile of wsl
+func GetDefaultDistributionProfile() (profile Profile, err error) {
+	profile = NewProfile()
+	uuid, err := GetDefaultDistributionUuid()
+	if err != nil {
+		return
+	}
+	profile, err = ReadProfile(uuid)
+	return
+}
+
 // GetLxUuidList gets guid key lists
 func GetLxUuidList() (uuidList []string, err error) {
 	baseKey, tmpErr := registry.OpenKey(LxssBaseRoot, LxssBaseKey, registry.READ)
